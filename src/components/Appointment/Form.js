@@ -12,12 +12,11 @@ export default function Form(props) {
     const reset = () => {
         setStudent("")
         setInterviewer(null)
+        props.onCancel()
     }
 
     const cancel = (props) =>{
         reset()
-        props.onCancel()
-        
     }
 
     return (
