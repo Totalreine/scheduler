@@ -17,7 +17,10 @@ export function getInterview(state, interview) {
       const interviewer = array.filter(item => item.id === interview.interviewer)
       const interviewerData = interviewer[0]
       const selectedInterview = {student: interview.student, interviewer: interviewerData}
-      return selectedInterview
+      if(interview.student !== "" && interview.interviewer !== null) {
+        return selectedInterview
+      }
+      
     } else {
       return null
     }
