@@ -10,7 +10,8 @@ export function useVisualMode(initial) {
         } else {
             history.push(mode)
             setHistory(history)
-            setMode(history[history.length-1])
+            const last = history[history.length-1]
+            setMode(last)
         }
     }
 
