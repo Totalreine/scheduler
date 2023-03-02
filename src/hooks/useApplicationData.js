@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { getAppointmentsForDay } from "helpers/selectors";
+
 
 export function useApplicationData() {
 
@@ -19,22 +19,39 @@ export function useApplicationData() {
     axios.get('http://localhost:8001/api/appointments'),
     axios.get('http://localhost:8001/api/interviewers')
     ]).then((all) => {
-      setState(prev => ({...prev, days:all[0].data, appointments: all[1].data, interviewers: all[2].data }))
-      //const array = [state.days]
-    });
+       const newState = updateAllSpots({day: state.day, days: all[0].data, appointments:all[1].data, interviewers:all[2].data})
+       setState(prev => ({...prev, ...newState }))
+    })
       }, [])
-      
-      const dailyAppointments = getAppointmentsForDay(state, state.day);
-      const appointments = dailyAppointments.filter(item => item.interview.interviewer === null)
-      const remainigSpots = appointments.length
-      
-      const array = [...state.days]
-      for (let day of array) {
-        
-        day.spots = remainigSpots
-      }
 
-      console.log("array", array)
+
+    const updateAllSpots = (state) => {
+    return state.days.reduce((acc, dayObj) => { 
+        return updateSpots(acc, dayObj.name)
+    }, state)
+    }
+      
+    const updateSpots = (state, aDay) => {
+        
+        const currentDayIndex = state.days.findIndex(day => day.name === aDay)
+        const currentDay = state.days[currentDayIndex]
+        const dayListHead = state.days.slice(0, currentDayIndex)
+        const dayListTail = state.days.slice(currentDayIndex+1)
+
+        const listOfAppointments = currentDay.appointments.map(id => state.appointments[id])
+        
+        const listOfEmpty = listOfAppointments.filter(appoint => appoint.interview.interviewer === null)
+
+        const spots = listOfEmpty.length
+
+        const newCurrentDay = {...currentDay, spots}
+        const newDays = dayListHead.concat(newCurrentDay).concat(dayListTail)
+        const newState = {...state, days: newDays}
+
+        return newState
+    } 
+
+    
     
     const bookInterview = (id, interview) => {
     
@@ -48,8 +65,12 @@ export function useApplicationData() {
     };
     return axios.put(`http://localhost:8001/api/appointments/${id}`,
     {interview: interview})
-    .then((res) => setState({...state, appointments}))   
-    .then(() => {})
+    .then((res) => {
+        const newState = {...state, appointments}
+        const newStateWithNewSpots = updateSpots(newState, newState.day)
+        setState(newStateWithNewSpots)
+    })   
+    
     }
 
     const notInterview = {student: "", interviewer: null}
@@ -65,8 +86,12 @@ export function useApplicationData() {
     };
     return axios.put(`http://localhost:8001/api/appointments/${id}`,
     {interview: notInterview})
-    .then((res) => { setState({...state, appointments})})   
-    .then(()=> {})
+    .then((res) => { 
+        const newState = {...state, appointments}
+        const newStateWithNewSpots = updateSpots(newState, newState.day)
+        setState(newStateWithNewSpots)
+    })   
+    
     }
 
     return {

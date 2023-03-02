@@ -23,10 +23,12 @@ export default function Form(props) {
         }
       
         props.onSave(student, interviewer);
+        setError("")
     }
       
 
     const reset = () => {
+        setError("")
         setStudent("")
         setInterviewer(null)
         props.onCancel()
