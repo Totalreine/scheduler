@@ -32,7 +32,7 @@ export function useApplicationData() {
       });
       setState((prev) => ({ ...prev, ...newState }));
     });
-  }, [updateAllSpots]);
+  }, []);
 
   /* This function updates the ramining spots for each day of the week when we make a request to the server 
   and also updates the raminig spots when we call the bookInterview and the cancelInterview functions*/
