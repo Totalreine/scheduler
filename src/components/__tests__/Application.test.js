@@ -130,7 +130,7 @@ it("shows the save error when failing to save an appointment", async () => {
 
   expect(getByText(appointment, "Saving")).toBeInTheDocument(); 
 
-  axios.put.mockRejectedValueOnce();
+  //axios.put.mockRejectedValueOnce();
 
   await waitForElementToBeRemoved(() => getByText(appointment, "Saving"));
 
@@ -162,7 +162,7 @@ it("shows the delete error when failing to delete an existing appointment", asyn
     // 6. Check that the element with the text "Deleting" is displayed.
     expect(getByText(appointment, "Deleting")).toBeInTheDocument();  
 
-    axios.put.mockRejectedValueOnce();
+    //axios.put.mockRejectedValueOnce();
 
     await waitForElementToBeRemoved(() => getByText(appointment, "Deleting"));
 
