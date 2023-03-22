@@ -26,8 +26,7 @@ export function useApplicationData() {
     });
   }, []);
 
-  /* This function updates the ramining spots for each day of the week when we make a request to the server 
-  and also updates the raminig spots when we call the bookInterview and the cancelInterview functions*/
+  /* This function updates the raminig spots when we call the bookInterview and the cancelInterview functions*/
   const updateSpots = (state, aDay) => {
     const currentDayIndex = state.days.findIndex((day) => day.name === aDay);
     const currentDay = state.days[currentDayIndex];
