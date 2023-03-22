@@ -11,25 +11,17 @@ export function useApplicationData() {
 
   const setDay = (day) => setState({ ...state, day });
 
-  /* This function passes each day of week and the state to the updateSpots function
-  for the update of the remaining spots when we make a request to the server*/
-  const updateAllSpots = (state) => {
-    return state.days.reduce((acc, dayObj) => {
-      return updateSpots(acc, dayObj.name);
-    }, state);
-  };
-
   useEffect(() => {
     Promise.all([
       axios.get("/api/days"),
       axios.get("/api/appointments"),
       axios.get("/api/interviewers"),
     ]).then((all) => {
-      const newState = updateAllSpots({
-        days: all[0].data,
-        appointments: all[1].data,
-        interviewers: all[2].data,
-      });
+      const newState = {
+        days: all[0].data || [],
+        appointments: all[1].data || [],
+        interviewers: all[2].data || [],
+      };
       setState((prev) => ({ ...prev, ...newState }));
     });
   }, []);
@@ -47,7 +39,7 @@ export function useApplicationData() {
     );
 
     const listOfEmpty = listOfAppointments.filter(
-      (appoint) => appoint.interview.interviewer === null
+      (appoint) => appoint.interview === null
     );
 
     const spots = listOfEmpty.length;
@@ -77,7 +69,7 @@ export function useApplicationData() {
       });
   };
 
-  const notInterview = { student: "", interviewer: null };
+  const notInterview = null;
 
   const cancelInterview = (id) => {
     const appointment = {
@@ -88,13 +80,11 @@ export function useApplicationData() {
       ...state.appointments,
       [id]: appointment,
     };
-    return axios
-      .put(`/api/appointments/${id}`, { interview: notInterview })
-      .then((res) => {
-        const newState = { ...state, appointments };
-        const newStateWithNewSpots = updateSpots(newState, newState.day);
-        setState(newStateWithNewSpots);
-      });
+    return axios.delete(`/api/appointments/${id}`).then((res) => {
+      const newState = { ...state, appointments };
+      const newStateWithNewSpots = updateSpots(newState, newState.day);
+      setState(newStateWithNewSpots);
+    });
   };
 
   return {
